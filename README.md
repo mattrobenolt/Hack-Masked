@@ -31,6 +31,11 @@ rules live in the font's `ccmp` feature and run when the app shapes text.
 | WezTerm | `font = wezterm.font("Hack Masked")` |
 | Windows Terminal | Settings → Profiles → Appearance → Font face → `Hack Masked` |
 
+Zed shapes each syntax-highlighted span separately. Context rules that cross a
+span boundary may not mask. Use the terminal or set the file to plain text when
+you need the full line masked.
+
+
 Restart the app if `Hack Masked` does not show in the font menu.
 
 To check it, run the command below.
