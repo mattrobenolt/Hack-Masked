@@ -1,6 +1,6 @@
 # Hack Masked
 
-Hack 3.003 with the secret-masking rules from Obel Mono Masked 1.000.
+Hack 3.003 with the secret-masking rules from [Obel Mono Masked](https://typographic.systems/obel-mono/) 1.000.
 
 ![preview](preview.png)
 
