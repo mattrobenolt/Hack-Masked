@@ -80,6 +80,17 @@ The build needs Nix. The flake supplies Python, fontTools, and HarfBuzz. The
 - A key that wraps to a second line shows on that line.
 - The font does not protect against a process that reads the text.
 
+## Credit
+
+The masking idea, the `ccmp` rule set, and the mask dot come from
+[Obel Mono](https://typographic.systems/obel-mono/) by Cody Collier and the
+Obel Mono Project Authors. Read the original write-up:
+[A typeface that keeps a secret](https://typographic.systems/journal/a-typeface-that-keeps-a-secret).
+
+Hack is by [Source Foundry](https://github.com/source-foundry/Hack).
+
+Thank you to both projects. Hack Masked only applies the Obel rules to Hack.
+
 ## Licenses
 
 The font files are distributed under the SIL Open Font License 1.1 because
