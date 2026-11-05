@@ -1,102 +1,84 @@
 # Hack Masked
 
-Hack 3.003 with the secret-masking OpenType rules from Obel Mono Masked 1.000.
+Hack 3.003 with the secret-masking rules from Obel Mono Masked 1.000.
 
-Source: https://github.com/mattrobenolt/Hack-Masked
+![preview](preview.png)
 
-## Result
-
-The font replaces a detected secret with a mask dot. Four characters after the
-secret marker stay visible. The text buffer does not change. Copy and paste
-returns the real secret. The mask is visual only.
-
-`preview.png` shows the result.
+Hack Masked replaces a detected secret with dots after the first four visible
+characters. `GITHUB_TOKEN=xY7kQ2pLm9ZtR4vB` shows as `GITHUB_TOKEN=xY7k` plus
+twelve dots. The text does not change. Copy and paste returns the real key.
 
 ## Install
 
-From a clone:
+Download the four TTFs from `dist/` or the latest release. On macOS,
+double-click each file. From a clone, run `./install.sh`.
 
-1. Run `./install.sh`.
-2. Open the font menu in the terminal or editor.
-3. Select `Hack Masked`.
+The family includes all four Hack styles.
 
-The family contains Regular, Bold, Italic, and Bold Italic. The four TTFs are
-also in `dist/`. On macOS, double-click each file to install it.
+## Turn it on
 
-## Use
+Pick `Hack Masked` as the font in the app. There is no separate switch. The
+rules live in the font's `ccmp` feature and run when the app shapes text.
 
-Set `Hack Masked` as the font. Run this command:
+| App | Setting |
+| --- | --- |
+| Terminal.app | Settings → Profiles → Text → Font → Change → `Hack Masked` |
+| iTerm2 | Settings → Profiles → Text → Font → `Hack Masked`, then enable **Use ligatures** |
+| VS Code | `"editor.fontFamily": "Hack Masked"` and `"editor.fontLigatures": true` |
+| Zed | `"buffer_font_family": "Hack Masked"` |
+| Ghostty | `font-family = "Hack Masked"` |
+| Kitty | `font_family Hack Masked` |
+| WezTerm | `font = wezterm.font("Hack Masked")` |
+| Windows Terminal | Settings → Profiles → Appearance → Font face → `Hack Masked` |
+
+Restart the app if `Hack Masked` does not show in the font menu.
+
+To check it, run the command below.
 
 ```sh
 printf 'GITHUB_TOKEN=xY7kQ2pLm9ZtR4vB\n'
 ```
 
-The terminal shows `GITHUB_TOKEN=xY7k` followed by mask dots.
+You should see `GITHUB_TOKEN=xY7k` and then dots.
 
-If iTerm2 does not apply the rules, enable `Use ligatures`. Some applications
-disable OpenType layout when ligatures are off.
+## What it does not do
+
+The mask changes pixels only. Copy and paste still returns the real key. So
+does shell history, and so does any process that reads the text. Apps that do
+not shape text, like Alacritty, show the plain string. A key that wraps to a
+second line shows on that line.
 
 ## How it works
 
-A font can run a small program during shaping. Obel Mono Masked stores the
-secret rules in the OpenType `ccmp` feature. The rules use chained contextual
-substitutions with a backtrack context. A note glyph marks the start of a
-secret. A second rule replaces each character after four visible characters
-with a mask dot. Each dot depends on the glyphs behind it.
+Obel Mono Masked keeps the rules in the OpenType `ccmp` feature.
+`build_masked.py` copies that rule set into Hack, maps the glyph names through
+Unicode, adds invisible note glyphs that copy Hack's own outlines, and adds the
+mask dots. `compare.py` shapes 520 strings in both fonts and checks that the
+output matches. `preview.png` was rendered with CoreText.
 
-The build script does four steps:
+## Build
 
-1. It reads the `ccmp` closure from Obel Mono Masked. The closure has 108
-   lookups and 700 glyph names.
-2. It maps each Obel glyph name to the Hack glyph name for the same Unicode
-   code point.
-3. It adds 275 to 279 note glyphs to Hack. Each note glyph copies the outline
-   of its visible base glyph. It also adds the 20 mask glyphs from Obel and
-   scales them from 2000 to 2048 units per em.
-4. It appends the lookups to the Hack GSUB table and registers a `ccmp`
-   feature.
+```sh
+./build.sh
+./install.sh
+```
 
-The script then renames the family to `Hack Masked`.
-
-## Test
-
-`compare.py` shapes 520 strings with HarfBuzz in both fonts and compares the
-results. The current build reports 0 differences. `render.swift` draws the
-installed font with CoreText. It produced `preview.png`.
-
-## Rebuild
-
-1. Run `./build.sh`.
-2. Run `./install.sh`.
-
-The build needs Nix. The flake supplies Python, fontTools, and HarfBuzz. The
-`Hack/ttf` and `Obel/ttf` folders contain the input fonts.
-
-## Limits
-
-- The mask changes pixels only. It does not change the text buffer.
-- An application that does not shape text shows the real characters.
-  Alacritty is one example.
-- A key that wraps to a second line shows on that line.
-- The font does not protect against a process that reads the text.
+Nix supplies the build toolchain. The flake pins fontTools and HarfBuzz. The
+`Hack/ttf` and `Obel/ttf` folders hold the input fonts.
 
 ## Credit
 
-The masking idea, the `ccmp` rule set, and the mask dot come from
-[Obel Mono](https://typographic.systems/obel-mono/) by Cody Collier and the
-Obel Mono Project Authors. Read the original write-up:
+The rules and the mask dot are from [Obel Mono](https://typographic.systems/obel-mono/)
+by Cody Collier and the Obel Mono Project Authors. Read the original post,
 [A typeface that keeps a secret](https://typographic.systems/journal/a-typeface-that-keeps-a-secret).
 
-Hack is by [Source Foundry](https://github.com/source-foundry/Hack).
+Hack is from Source Foundry: https://github.com/source-foundry/Hack.
 
-Thank you to both projects. Hack Masked only applies the Obel rules to Hack.
+## License
 
-## Licenses
+The fonts are SIL OFL 1.1 because they carry the Obel material. The Hack parts
+stay MIT and Bitstream Vera. Build scripts are MIT. See `LICENSE`,
+`Hack-LICENSE.md`, and `Obel-OFL.txt`.
 
-The font files are distributed under the SIL Open Font License 1.1 because
-they include the Obel Mono mask glyph and masking rules. The Hack components
-remain under the MIT License and the Bitstream Vera License. The build scripts
-are MIT licensed. See `LICENSE`, `Hack-LICENSE.md`, and `Obel-OFL.txt`.
-
-Hack Masked is an unofficial modification. It is not affiliated with or
-endorsed by Source Foundry or the Obel Mono Project.
+This is an unofficial modification. It is not affiliated with or endorsed by
+Source Foundry or the Obel Mono Project.
